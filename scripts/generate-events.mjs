@@ -22,6 +22,7 @@ title: "${event.title}"
 description: "${event.description}"
 date: ${dateStr}
 time: "${event.time}"
+location: "${event.location}"
 organizerLink: "${event.organizerLink}"
 ---
 

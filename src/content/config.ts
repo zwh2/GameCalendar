@@ -7,6 +7,7 @@ const eventsCollection = defineCollection({
         description: z.string(),
         date: z.date(),
         time: z.string(),
+        location: z.string(),
         organizerLink: z.string().url(),
     }),
 });

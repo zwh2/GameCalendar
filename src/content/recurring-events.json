@@ -4,6 +4,7 @@
         "title": "Strategy Saturday",
         "description": "Join us for an afternoon of heavy strategy board games! All experience levels welcome.",
         "time": "14:00 - 18:00",
+        "location": "The Game Keep, Local Store",
         "organizerLink": "https://meetup.com",
         "recurrence": {
             "type": "weekly",
@@ -16,6 +17,7 @@
         "title": "First Friday Casual Night",
         "description": "Kick off the month with lighter party and casual games!",
         "time": "19:00 - 23:00",
+        "location": "Community Center, Main Hall",
         "organizerLink": "https://facebook.com",
         "recurrence": {
             "type": "monthly-nth-weekday",
@@ -29,6 +31,7 @@
         "title": "Mid-Month Magic Draft",
         "description": "Our monthly Magic: The Gathering draft. Entry is $15 to cover prize support and packs.",
         "time": "18:00 - 22:00",
+        "location": "Dice Tower Cafe",
         "organizerLink": "https://example.com",
         "recurrence": {
             "type": "monthly-date",

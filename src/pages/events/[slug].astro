@@ -11,7 +11,7 @@ export async function getStaticPaths() {
 }
 
 const { event } = Astro.props;
-const { title, description, date, time, organizerLink } = event.data;
+const { title, description, date, time, location, organizerLink } = event.data;
 
 const { Content } = await event.render();
 
@@ -49,12 +49,20 @@ const base = import.meta.env.BASE_URL;
           </div>
         </div>
         <div class="meta-item">
+          <span class="meta-icon">📍</span>
+          <div>
+            <strong>Location</strong>
+            <p>{location}</p>
+          </div>
+        </div>
+        <div class="meta-item">
           <span class="meta-icon">🔗</span>
           <div>
             <strong>Info / RSVP</strong>
             <p>
               <a href={organizerLink} target="_blank" rel="noopener noreferrer"
-                >Organizer Link</a>
+                >Organizer Link</a
+              >
             </p>
           </div>
         </div>
