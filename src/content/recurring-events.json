@@ -1,0 +1,39 @@
+[
+    {
+        "slug": "strategy-saturday",
+        "title": "Strategy Saturday",
+        "description": "Join us for an afternoon of heavy strategy board games! All experience levels welcome.",
+        "time": "14:00 - 18:00",
+        "organizerLink": "https://meetup.com",
+        "recurrence": {
+            "type": "weekly",
+            "weekday": 6
+        },
+        "body": "We play everything from Terraforming Mars and Brass: Birmingham to Twilight Imperium. We usually have a dedicated teaching table for new players."
+    },
+    {
+        "slug": "first-friday",
+        "title": "First Friday Casual Night",
+        "description": "Kick off the month with lighter party and casual games!",
+        "time": "19:00 - 23:00",
+        "organizerLink": "https://facebook.com",
+        "recurrence": {
+            "type": "monthly-nth-weekday",
+            "n": 1,
+            "weekday": 5
+        },
+        "body": "We focus on quick, easy-to-learn games like Codenames, Ticket to Ride, and Just One. Bring your own drinks and snacks."
+    },
+    {
+        "slug": "mid-month-magic",
+        "title": "Mid-Month Magic Draft",
+        "description": "Our monthly Magic: The Gathering draft. Entry is $15 to cover prize support and packs.",
+        "time": "18:00 - 22:00",
+        "organizerLink": "https://example.com",
+        "recurrence": {
+            "type": "monthly-date",
+            "date": 15
+        },
+        "body": "We rotate through different draft formats each month. Check details on the registration page."
+    }
+]
