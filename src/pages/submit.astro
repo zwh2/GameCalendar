@@ -1,0 +1,172 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Submit an Event">
+  <div class="submit-container">
+    <div class="text-center intro">
+      <h1 class="text-gradient">Submit an Event</h1>
+      <p class="subtitle">Know about a local board game night? Let us know and we'll add it to the calendar!</p>
+    </div>
+
+    <div class="glass-panel form-wrapper">
+      <!-- We use Formspree since this is a static site. -->
+      <form action="https://formspree.io/f/mlgwwgdq" method="POST" id="submitForm" class="event-form">
+        
+        <div class="form-group">
+          <label for="title">Event Title <span class="required">*</span></label>
+          <input type="text" id="title" name="title" required placeholder="e.g., Downtown Board Game Night" class="form-input" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="date">Date <span class="required">*</span></label>
+            <input type="date" id="date" name="date" required class="form-input" />
+          </div>
+          <div class="form-group">
+            <label for="time">Time <span class="required">*</span></label>
+            <input type="text" id="time" name="time" required placeholder="e.g., 18:00 - 22:00" class="form-input" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="organizerLink">Organizer/RSVP Link <span class="required">*</span></label>
+          <input type="url" id="organizerLink" name="organizerLink" required placeholder="https://meetup.com/..." class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Event Description <span class="required">*</span></label>
+          <textarea id="description" name="description" rows="5" required placeholder="Tell us about the event..." class="form-input"></textarea>
+        </div>
+        
+        <div class="form-info">
+          <p>ℹ️ All submissions are reviewed manually before being posted to the site.</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary submit-btn">Submit Event for Review</button>
+      </form>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Fallback if the user doesn't set up Formspree
+  const form = document.getElementById('submitForm') as HTMLFormElement;
+  form.addEventListener('submit', (e) => {
+    if (form.action.includes('YOUR_FORM_ENDPOINT')) {
+      e.preventDefault();
+      
+      const formData = new FormData(form);
+      const subject = encodeURIComponent(`New Event Submission: ${formData.get('title')}`);
+      let body = `Please review the following event submission:\n\n`;
+      body += `Title: ${formData.get('title')}\n`;
+      body += `Date: ${formData.get('date')}\n`;
+      body += `Time: ${formData.get('time')}\n`;
+      body += `Link: ${formData.get('organizerLink')}\n\n`;
+      body += `Description:\n${formData.get('description')}\n`;
+      
+      window.location.href = `mailto:your-email@example.com?subject=${subject}&body=${encodeURIComponent(body)}`;
+      
+      alert('Since a form backend is not configured, this will try to open your email client. Alternatively, you can sign up for Formspree.io to collect submissions automatically.');
+    }
+  });
+</script>
+
+<style>
+  .submit-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 0;
+  }
+
+  .intro {
+    margin-bottom: 3rem;
+  }
+  
+  .intro h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-wrapper {
+    padding: 2.5rem;
+  }
+
+  .event-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+  }
+
+  .required {
+    color: var(--accent-primary);
+  }
+
+  .form-input {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: 1rem;
+    transition: var(--transition);
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(189, 147, 249, 0.2);
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  .form-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  textarea.form-input {
+    resize: vertical;
+  }
+
+  .form-info {
+    background: rgba(139, 233, 253, 0.1);
+    border-left: 4px solid var(--accent-secondary);
+    padding: 1rem;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .submit-btn {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    padding: 1rem;
+  }
+
+  @media (max-width: 600px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+    .form-wrapper {
+      padding: 1.5rem;
+    }
+  }
+</style>

@@ -1,0 +1,208 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+
+const allEvents = await getCollection('events');
+
+// Group events by date string (YYYY-MM-DD)
+const eventsByDate = allEvents.reduce((acc, event) => {
+  const dateStr = event.data.date.toISOString().split('T')[0];
+  if (!acc[dateStr]) acc[dateStr] = [];
+  acc[dateStr].push(event);
+  return acc;
+}, {} as Record<string, typeof allEvents>);
+
+// Basic calendar logic (Static for current month + next month for demo purposes)
+const today = new Date();
+const currentMonth = today.getMonth();
+const currentYear = today.getFullYear();
+
+// Get days in current month
+const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+
+const monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+const calendarDays = [];
+// Pad start of month
+for (let i = 0; i < firstDayOfMonth; i++) {
+  calendarDays.push(null);
+}
+// Add actual days
+for (let i = 1; i <= daysInMonth; i++) {
+  const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+  calendarDays.push({
+    day: i,
+    dateStr,
+    events: eventsByDate[dateStr] || []
+  });
+}
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="Calendar">
+  <div class="header-section text-center">
+    <h1 class="text-gradient">Event Calendar</h1>
+    <p class="subtitle">See what's happening in {monthNames[currentMonth]} {currentYear}</p>
+  </div>
+
+  <div class="calendar-container glass-panel">
+    <div class="calendar-grid">
+      <div class="weekday">Sun</div>
+      <div class="weekday">Mon</div>
+      <div class="weekday">Tue</div>
+      <div class="weekday">Wed</div>
+      <div class="weekday">Thu</div>
+      <div class="weekday">Fri</div>
+      <div class="weekday">Sat</div>
+
+      {calendarDays.map((dayObj) => {
+        if (!dayObj) return <div class="calendar-cell empty"></div>;
+        
+        const isToday = dayObj.dateStr === today.toISOString().split('T')[0];
+        const hasEvents = dayObj.events.length > 0;
+
+        return (
+          <div class={`calendar-cell ${isToday ? 'today' : ''} ${hasEvents ? 'has-events' : ''}`}>
+             <div class="cell-header">
+               <span class="day-number">{dayObj.day}</span>
+             </div>
+             <div class="cell-events">
+               {dayObj.events.map(e => (
+                 <a href={`${base}/events/${e.slug}`} class="event-pill" title={e.data.title}>
+                   <span class="pill-time">{e.data.time.split('-')[0].trim()}</span>
+                   <span class="pill-title">{e.data.title}</span>
+                 </a>
+               ))}
+             </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .header-section {
+    margin-bottom: 3rem;
+  }
+  
+  .header-section h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .calendar-container {
+    padding: 1.5rem;
+    overflow-x: auto;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(120px, 1fr));
+    gap: 1px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .weekday {
+    background: rgba(0,0,0,0.5);
+    padding: 1rem;
+    text-align: center;
+    font-weight: 600;
+    color: var(--accent-secondary);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+  }
+
+  .calendar-cell {
+    background: var(--bg-surface);
+    min-height: 120px;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.2s;
+  }
+
+  .calendar-cell:hover:not(.empty) {
+    background: var(--bg-surface-hover);
+  }
+
+  .calendar-cell.empty {
+    background: rgba(0,0,0,0.2);
+  }
+
+  .cell-header {
+    text-align: right;
+    margin-bottom: 0.5rem;
+  }
+
+  .day-number {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  .calendar-cell.today .day-number {
+    background: var(--accent-gradient);
+    color: #000;
+    box-shadow: 0 0 10px rgba(189, 147, 249, 0.5);
+  }
+
+  .calendar-cell.has-events .day-number {
+    color: var(--text-primary);
+  }
+
+  .cell-events {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .event-pill {
+    display: flex;
+    align-items: center;
+    background: rgba(189, 147, 249, 0.15);
+    border-left: 3px solid var(--accent-primary);
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: transform 0.2s, background 0.2s;
+  }
+
+  .event-pill:hover {
+    background: rgba(189, 147, 249, 0.3);
+    transform: translateX(2px);
+    text-shadow: none;
+    color: #fff;
+  }
+
+  .pill-time {
+    font-weight: 700;
+    color: var(--accent-secondary);
+    margin-right: 6px;
+  }
+
+  .pill-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+</style>

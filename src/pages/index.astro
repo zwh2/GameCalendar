@@ -1,0 +1,115 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import EventCard from '../components/EventCard.astro';
+
+// Fetch and sort events by date (newest/upcoming first)
+const allEvents = await getCollection('events');
+const upcomingEvents = allEvents
+  .filter(event => new Date(event.data.date) >= new Date()) // In a real app, you might want to show past events too, or filter them out.
+  .sort((a, b) => new Date(a.data.date).valueOf() - new Date(b.data.date).valueOf());
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="Upcoming Events">
+  <div class="hero">
+    <h1>Find Your Next <br/><span class="text-gradient">Board Game Adventure</span></h1>
+    <p class="subtitle">Discover local meetups, open play nights, and tournaments in your area.</p>
+    <div class="hero-actions">
+      <a href="#events" class="btn btn-primary">Browse Events</a>
+      <a href={`${base}/calendar`} class="btn glass-panel" style="padding: 0.75rem 1.5rem; border-radius: 8px;">View Calendar</a>
+    </div>
+  </div>
+
+  <section id="events" class="events-section">
+    <h2>Upcoming Events</h2>
+    
+    {upcomingEvents.length === 0 ? (
+      <div class="glass-panel text-center empty-state">
+        <p>No upcoming events found. Check back later or submit your own!</p>
+        <a href={`${base}/submit`} class="btn btn-primary" style="margin-top: 1rem;">Submit an Event</a>
+      </div>
+    ) : (
+      <div class="events-list">
+        {upcomingEvents.map(event => (
+          <EventCard event={event} />
+        ))}
+      </div>
+    )}
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 4rem 1rem 6rem;
+    position: relative;
+  }
+
+  /* Decorative background */
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 300px;
+    background: var(--accent-primary);
+    filter: blur(150px);
+    opacity: 0.2;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .empty-state {
+    padding: 4rem 2rem;
+  }
+
+  .events-section h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .events-section h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 50px;
+    height: 4px;
+    background: var(--accent-gradient);
+    border-radius: 2px;
+  }
+
+  @media (max-width: 600px) {
+    .hero-actions {
+      flex-direction: column;
+    }
+    .hero {
+      padding: 3rem 1rem;
+    }
+  }
+</style>
