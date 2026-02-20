@@ -18,7 +18,10 @@ const formattedDate = date.toLocaleDateString("en-US", {
 const base = import.meta.env.BASE_URL;
 ---
 
-<article class="glass-panel event-card">
+<a
+  href={`${base}/events/${event.slug}`}
+  class="glass-panel event-card card-link"
+>
   <div class="event-date">
     <span class="month"
       >{
@@ -30,7 +33,7 @@ const base = import.meta.env.BASE_URL;
 
   <div class="event-details">
     <h3 class="event-title">
-      <a href={`${base}/events/${event.slug}`}>{title}</a>
+      <span class="title-text">{title}</span>
     </h3>
     <div class="event-meta">
       <span class="meta-item">🕒 {time}</span>
@@ -38,12 +41,17 @@ const base = import.meta.env.BASE_URL;
       <span class="meta-item">🗓️ {formattedDate}</span>
     </div>
     <p class="event-description">{description}</p>
-    <a href={`${base}/events/${event.slug}`} class="read-more">View Details →</a
-    >
+    <span class="read-more">View Details →</span>
   </div>
-</article>
+</a>
 
 <style>
+  .card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
   .event-card {
     display: flex;
     gap: 1.5rem;
@@ -86,13 +94,9 @@ const base = import.meta.env.BASE_URL;
     margin-bottom: 0.5rem;
   }
 
-  .event-title a {
+  .title-text {
     color: var(--text-primary);
-  }
-
-  .event-title a:hover {
-    color: var(--accent-secondary);
-    text-shadow: 0 0 10px rgba(139, 233, 253, 0.4);
+    transition: all 0.2s ease;
   }
 
   .event-meta {
@@ -124,9 +128,10 @@ const base = import.meta.env.BASE_URL;
     color: var(--accent-primary);
     display: inline-flex;
     align-items: center;
+    transition: all 0.2s ease;
   }
 
-  .read-more:hover {
+  .card-link:hover .read-more {
     transform: translateX(4px);
     color: var(--accent-secondary);
   }

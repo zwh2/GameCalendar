@@ -8,7 +8,7 @@ interface Props {
 
 const {
   title,
-  description = "Find upcoming board game meetups in your area.",
+  description = "Find upcoming board game meetups in Kitsap County.",
 } = Astro.props;
 const baseUrl = import.meta.env.BASE_URL;
 ---
@@ -29,10 +29,7 @@ const baseUrl = import.meta.env.BASE_URL;
 
     <footer class="footer">
       <div class="container text-center">
-        <p style="margin-bottom: 1.5rem;">
-          Built for the local board game community. <br /> Want to run an event? Let
-          us know!
-        </p>
+        <p style="margin-bottom: 1.5rem;">Want to run an event? Let us know!</p>
         <a href={`${baseUrl}/submit`} class="btn btn-primary">Submit Event</a>
       </div>
     </footer>
