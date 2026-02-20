@@ -1,16 +1,19 @@
 ---
-import '../styles/global.css';
+import "../styles/global.css";
 
 interface Props {
   title: string;
   description?: string;
 }
 
-const { title, description = "Find upcoming board game meetups in your area." } = Astro.props;
+const {
+  title,
+  description = "Find upcoming board game meetups in your area.",
+} = Astro.props;
 const baseUrl = import.meta.env.BASE_URL;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -20,92 +23,31 @@ const baseUrl = import.meta.env.BASE_URL;
     <title>{title} | Board Game Events</title>
   </head>
   <body>
-    <header class="glass-panel header">
-      <div class="container nav-container">
-        <a href={baseUrl} class="logo text-gradient">🎲 Local Game Nights</a>
-        <nav>
-          <ul class="nav-links">
-            <li><a href={baseUrl}>Events</a></li>
-            <li><a href={`${baseUrl}/calendar`}>Calendar</a></li>
-            <li><a href={`${baseUrl}/submit`} class="btn btn-primary btn-sm">Submit Event</a></li>
-          </ul>
-        </nav>
-      </div>
-    </header>
-
     <main class="container">
       <slot />
     </main>
 
     <footer class="footer">
       <div class="container text-center">
-        <p>Built for the local board game community. <br/> Want to run an event? <a href={`${baseUrl}submit`}>Let us know!</a></p>
+        <p style="margin-bottom: 1.5rem;">
+          Built for the local board game community. <br /> Want to run an event? Let
+          us know!
+        </p>
+        <a href={`${baseUrl}/submit`} class="btn btn-primary">Submit Event</a>
       </div>
     </footer>
   </body>
 </html>
 
 <style>
-  .header {
-    border-radius: 0;
-    border-top: none;
-    border-left: none;
-    border-right: none;
-    padding: 1rem 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .nav-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0;
-  }
-
-  .logo {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-  }
-  
-  .logo:hover {
-    transform: scale(1.02);
-  }
-
-  .nav-links {
-    list-style: none;
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-  }
-
-  .btn-sm {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-  }
-
   .footer {
     margin-top: auto;
     padding: 3rem 0;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
-  
+
   .text-center {
     text-align: center;
     color: var(--text-secondary);
-  }
-
-  @media (max-width: 768px) {
-    .nav-container {
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .nav-links {
-      gap: 1rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
   }
 </style>

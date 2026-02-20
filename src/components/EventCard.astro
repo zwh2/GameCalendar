@@ -1,18 +1,18 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from "astro:content";
 
 interface Props {
-  event: CollectionEntry<'events'>;
+  event: CollectionEntry<"events">;
 }
 
 const { event } = Astro.props;
 const { title, date, time, description } = event.data;
 
-const formattedDate = date.toLocaleDateString('en-US', {
-  weekday: 'short',
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
+const formattedDate = date.toLocaleDateString("en-US", {
+  weekday: "short",
+  year: "numeric",
+  month: "short",
+  day: "numeric",
 });
 
 const base = import.meta.env.BASE_URL;
@@ -20,12 +20,18 @@ const base = import.meta.env.BASE_URL;
 
 <article class="glass-panel event-card">
   <div class="event-date">
-    <span class="month">{date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase()}</span>
+    <span class="month"
+      >{
+        date.toLocaleDateString("en-US", { month: "short" }).toUpperCase()
+      }</span
+    >
     <span class="day">{date.getDate()}</span>
   </div>
-  
+
   <div class="event-details">
-    <h3 class="event-title"><a href={`${base}events/${event.slug}`}>{title}</a></h3>
+    <h3 class="event-title">
+      <a href={`${base}/events/${event.slug}`}>{title}</a>
+    </h3>
     <div class="event-meta">
       <span class="meta-item">🕒 {time}</span>
       <span class="meta-item">🗓️ {formattedDate}</span>
@@ -77,7 +83,7 @@ const base = import.meta.env.BASE_URL;
   .event-title {
     margin-bottom: 0.5rem;
   }
-  
+
   .event-title a {
     color: var(--text-primary);
   }
@@ -127,7 +133,7 @@ const base = import.meta.env.BASE_URL;
     .event-card {
       flex-direction: column;
     }
-    
+
     .event-date {
       flex-direction: row;
       gap: 0.5rem;
@@ -135,7 +141,11 @@ const base = import.meta.env.BASE_URL;
       justify-content: flex-start;
       padding: 0.5rem 1rem;
     }
-    .month { font-size: 1rem; }
-    .day { font-size: 1.2rem; }
+    .month {
+      font-size: 1rem;
+    }
+    .day {
+      font-size: 1.2rem;
+    }
   }
 </style>

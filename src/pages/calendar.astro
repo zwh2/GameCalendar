@@ -1,56 +1,113 @@
 ---
-import { getCollection } from 'astro:content';
-import Layout from '../layouts/Layout.astro';
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import Hero from "../components/Hero.astro";
 
-const allEvents = await getCollection('events');
+const allEvents = await getCollection("events");
 
-// Group events by date string (YYYY-MM-DD)
-const eventsByDate = allEvents.reduce((acc, event) => {
-  const dateStr = event.data.date.toISOString().split('T')[0];
-  if (!acc[dateStr]) acc[dateStr] = [];
-  acc[dateStr].push(event);
-  return acc;
-}, {} as Record<string, typeof allEvents>);
-
-// Basic calendar logic (Static for current month + next month for demo purposes)
-const today = new Date();
-const currentMonth = today.getMonth();
-const currentYear = today.getFullYear();
-
-// Get days in current month
-const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-
-const monthNames = ["January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
-
-const calendarDays = [];
-// Pad start of month
-for (let i = 0; i < firstDayOfMonth; i++) {
-  calendarDays.push(null);
-}
-// Add actual days
-for (let i = 1; i <= daysInMonth; i++) {
-  const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-  calendarDays.push({
-    day: i,
-    dateStr,
-    events: eventsByDate[dateStr] || []
-  });
-}
+// Send only needed data to the client to keep DOM smaller
+const clientEvents = allEvents.map((e) => ({
+  dateStr: e.data.date.toISOString().split("T")[0],
+  slug: e.slug,
+  title: e.data.title,
+  time: e.data.time.split("-")[0].trim(),
+}));
 
 const base = import.meta.env.BASE_URL;
 ---
 
 <Layout title="Calendar">
-  <div class="header-section text-center">
-    <h1 class="text-gradient">Event Calendar</h1>
-    <p class="subtitle">See what's happening in {monthNames[currentMonth]} {currentYear}</p>
-  </div>
+  <Hero activePage="calendar" />
 
-  <div class="calendar-container glass-panel">
-    <div class="calendar-grid">
+  <div id="calendar-view" class="calendar-wrapper">
+    <div class="month-nav-header text-center">
+      <h2
+        id="current-month-label"
+        class="subtitle"
+        style="margin-bottom: 1rem;"
+      >
+        Loading Calendar...
+      </h2>
+    </div>
+    <div class="month-nav">
+      <button id="prev-month" class="btn glass-panel nav-btn"
+        >&larr; Previous</button
+      >
+      <button id="next-month" class="btn glass-panel nav-btn"
+        >Next &rarr;</button
+      >
+    </div>
+
+    <div class="calendar-container glass-panel">
+      <div
+        class="calendar-grid"
+        id="calendar-grid"
+        data-events={JSON.stringify(clientEvents)}
+        data-base={base}
+      >
+        <!-- Calendar headers and days injected via client script -->
+        <div class="weekday">Sun</div>
+        <div class="weekday">Mon</div>
+        <div class="weekday">Tue</div>
+        <div class="weekday">Wed</div>
+        <div class="weekday">Thu</div>
+        <div class="weekday">Fri</div>
+        <div class="weekday">Sat</div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  let currentDate = new Date(); // Start at today
+
+  const gridEl = document.getElementById("calendar-grid") as HTMLElement;
+  const labelEl = document.getElementById("current-month-label");
+  const prevBtn = document.getElementById("prev-month");
+  const nextBtn = document.getElementById("next-month");
+
+  // Parse events data passed from server
+  const allEvents: any[] = JSON.parse(gridEl.dataset.events || "[]");
+  const baseUrl = gridEl.dataset.base;
+
+  // Group events by date string
+  const eventsByDate = allEvents.reduce((acc: any, event: any) => {
+    if (!acc[event.dateStr]) acc[event.dateStr] = [];
+    acc[event.dateStr].push(event);
+    return acc;
+  }, {});
+
+  function renderCalendar() {
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    const todayStr = new Date().toISOString().split("T")[0];
+
+    // Update label
+    if (labelEl) {
+      labelEl.textContent = `See what's happening in ${monthNames[currentMonth]} ${currentYear}`;
+    }
+
+    // Get calendar math
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+
+    // Preserve weekday headers
+    const weekdayHeaders = `
       <div class="weekday">Sun</div>
       <div class="weekday">Mon</div>
       <div class="weekday">Tue</div>
@@ -58,41 +115,91 @@ const base = import.meta.env.BASE_URL;
       <div class="weekday">Thu</div>
       <div class="weekday">Fri</div>
       <div class="weekday">Sat</div>
+    `;
 
-      {calendarDays.map((dayObj) => {
-        if (!dayObj) return <div class="calendar-cell empty"></div>;
-        
-        const isToday = dayObj.dateStr === today.toISOString().split('T')[0];
-        const hasEvents = dayObj.events.length > 0;
+    let cellsHtml = "";
 
-        return (
-          <div class={`calendar-cell ${isToday ? 'today' : ''} ${hasEvents ? 'has-events' : ''}`}>
+    // Pad start of month
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      cellsHtml += `<div class="calendar-cell empty"></div>`;
+    }
+
+    // Actual days
+    for (let i = 1; i <= daysInMonth; i++) {
+      // Build YYYY-MM-DD string with padded 0s
+      const m = String(currentMonth + 1).padStart(2, "0");
+      const d = String(i).padStart(2, "0");
+      const dateStr = `${currentYear}-${m}-${d}`;
+
+      const isToday = dateStr === todayStr;
+      const dayEvents = eventsByDate[dateStr] || [];
+      const hasEvents = dayEvents.length > 0;
+
+      let eventsHtml = "";
+      dayEvents.forEach((e: any) => {
+        eventsHtml += `
+              <a href="${baseUrl}/events/${e.slug}" class="event-pill" title="${e.title.replace(/"/g, "&quot;")}">
+                <span class="pill-time">${e.time}</span>
+                <span class="pill-title">${e.title}</span>
+              </a>
+            `;
+      });
+
+      cellsHtml += `
+          <div class="calendar-cell ${isToday ? "today" : ""} ${hasEvents ? "has-events" : ""}">
              <div class="cell-header">
-               <span class="day-number">{dayObj.day}</span>
+               <span class="day-number">${i}</span>
              </div>
              <div class="cell-events">
-               {dayObj.events.map(e => (
-                 <a href={`${base}/events/${e.slug}`} class="event-pill" title={e.data.title}>
-                   <span class="pill-time">{e.data.time.split('-')[0].trim()}</span>
-                   <span class="pill-title">{e.data.title}</span>
-                 </a>
-               ))}
+                 ${eventsHtml}
              </div>
           </div>
-        );
-      })}
-    </div>
-  </div>
-</Layout>
+        `;
+    }
 
-<style>
-  .header-section {
-    margin-bottom: 3rem;
+    gridEl.innerHTML = weekdayHeaders + cellsHtml;
   }
-  
-  .header-section h1 {
-    font-size: 3rem;
-    margin-bottom: 0.5rem;
+
+  // Event listeners
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar();
+    });
+  }
+
+  // Initial render
+  if (gridEl) {
+    renderCalendar();
+  }
+</script>
+
+<style is:global>
+  /* CALENDAR VIEW STYLES */
+  .calendar-wrapper {
+    max-width: 1200px;
+    margin: 0 auto 4rem auto;
+    scroll-margin-top: 5rem;
+  }
+
+  .month-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding: 0 1rem;
+  }
+
+  .nav-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    color: var(--text-primary);
   }
 
   .calendar-container {
@@ -100,18 +207,25 @@ const base = import.meta.env.BASE_URL;
     overflow-x: auto;
   }
 
+  .calendar-container.glass-panel:hover {
+    transform: none;
+    box-shadow: var(--glass-shadow);
+    background: var(--bg-surface);
+    border: var(--glass-border);
+  }
+
   .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, minmax(120px, 1fr));
     gap: 1px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     overflow: hidden;
   }
 
   .weekday {
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     padding: 1rem;
     text-align: center;
     font-weight: 600;
@@ -135,7 +249,7 @@ const base = import.meta.env.BASE_URL;
   }
 
   .calendar-cell.empty {
-    background: rgba(0,0,0,0.2);
+    background: rgba(0, 0, 0, 0.2);
   }
 
   .cell-header {
@@ -158,7 +272,7 @@ const base = import.meta.env.BASE_URL;
   .calendar-cell.today .day-number {
     background: var(--accent-gradient);
     color: #000;
-    box-shadow: 0 0 10px rgba(189, 147, 249, 0.5);
+    box-shadow: 0 0 10px rgba(255, 126, 0, 0.5);
   }
 
   .calendar-cell.has-events .day-number {
@@ -175,7 +289,7 @@ const base = import.meta.env.BASE_URL;
   .event-pill {
     display: flex;
     align-items: center;
-    background: rgba(189, 147, 249, 0.15);
+    background: rgba(255, 126, 0, 0.15);
     border-left: 3px solid var(--accent-primary);
     padding: 4px 6px;
     border-radius: 4px;
@@ -185,11 +299,13 @@ const base = import.meta.env.BASE_URL;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: transform 0.2s, background 0.2s;
+    transition:
+      transform 0.2s,
+      background 0.2s;
   }
 
   .event-pill:hover {
-    background: rgba(189, 147, 249, 0.3);
+    background: rgba(255, 126, 0, 0.3);
     transform: translateX(2px);
     text-shadow: none;
     color: #fff;

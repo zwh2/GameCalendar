@@ -1,0 +1,87 @@
+---
+interface Props {
+    activePage?: "events" | "calendar";
+}
+
+const { activePage } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<div class="hero">
+    <h1>
+        Find Your Next <br /><span class="text-gradient"
+            >Board Game Adventure</span>
+    </h1>
+    <p class="subtitle">
+        Discover local meetups, open play nights, and tournaments in your area.
+    </p>
+    <div class="hero-actions">
+        <a
+            href={`${base}/`}
+            class={`btn ${activePage === "events" ? "btn-primary" : "glass-panel"}`}
+            style={activePage === "calendar"
+                ? "padding: 0.75rem 1.5rem; border-radius: 8px;"
+                : ""}>Browse Events</a
+        >
+        <a
+            href={`${base}/calendar`}
+            class={`btn ${activePage === "calendar" ? "btn-primary" : "glass-panel"}`}
+            style={activePage === "events"
+                ? "padding: 0.75rem 1.5rem; border-radius: 8px;"
+                : ""}>View Calendar</a
+        >
+    </div>
+</div>
+
+<style>
+    .hero {
+        text-align: center;
+        padding: 4rem 1rem 6rem;
+        position: relative;
+        scroll-margin-top: 5rem;
+    }
+
+    /* Decorative background */
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 300px;
+        background: var(--accent-primary);
+        filter: blur(150px);
+        opacity: 0.2;
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    .hero h1 {
+        font-size: clamp(2.5rem, 5vw, 4.5rem);
+        margin-bottom: 1.5rem;
+        line-height: 1.1;
+    }
+
+    .subtitle {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto 2.5rem;
+    }
+
+    .hero-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+        .hero-actions {
+            flex-direction: column;
+        }
+        .hero {
+            padding: 3rem 1rem;
+        }
+    }
+</style>
