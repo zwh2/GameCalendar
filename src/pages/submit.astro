@@ -1,73 +1,169 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Submit an Event">
   <div class="submit-container">
     <div class="text-center intro">
       <h1 class="text-gradient">Submit an Event</h1>
-      <p class="subtitle">Know about a local board game night? Let us know and we'll add it to the calendar!</p>
+      <p class="subtitle">
+        Know about a local board game night? Let us know and we'll add it to the
+        calendar!
+      </p>
     </div>
 
     <div class="glass-panel form-wrapper">
       <!-- We use Formspree since this is a static site. -->
-      <form action="https://formspree.io/f/mlgwwgdq" method="POST" id="submitForm" class="event-form">
-        
+      <form action="" method="POST" id="submitForm" class="event-form">
+        <!-- Formspree Redirect Configuration -->
+        <input
+          type="hidden"
+          name="_next"
+          value="https://zhudson.github.io/GameCalendar/success"
+        />
         <div class="form-group">
           <label for="title">Event Title <span class="required">*</span></label>
-          <input type="text" id="title" name="title" required placeholder="e.g., Downtown Board Game Night" class="form-input" />
+          <input
+            type="text"
+            id="title"
+            name="title"
+            required
+            placeholder="e.g., Downtown Board Game Night"
+            class="form-input"
+          />
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="date">Date <span class="required">*</span></label>
-            <input type="date" id="date" name="date" required class="form-input" />
+            <input
+              type="date"
+              id="date"
+              name="date"
+              required
+              class="form-input"
+            />
           </div>
           <div class="form-group">
-            <label for="time">Time <span class="required">*</span></label>
-            <input type="text" id="time" name="time" required placeholder="e.g., 18:00 - 22:00" class="form-input" />
+            <label>Time <span class="required">*</span></label>
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <input
+                type="time"
+                id="startTime"
+                name="startTime"
+                required
+                class="form-input"
+                style="flex: 1;"
+                step="60"
+              />
+              <span style="color: var(--text-secondary);">to</span>
+              <input
+                type="time"
+                id="endTime"
+                name="endTime"
+                required
+                class="form-input"
+                style="flex: 1;"
+                step="60"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="location"
+              >Location <span class="required">*</span></label
+            >
+            <input
+              type="text"
+              id="location"
+              name="location"
+              required
+              placeholder="e.g., Downtown Library - Room C"
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="organizerLink">Organizer Link</label>
+            <input
+              type="url"
+              id="organizerLink"
+              name="organizerLink"
+              placeholder="https://meetup.com/..."
+              class="form-input"
+            />
           </div>
         </div>
 
         <div class="form-group">
-          <label for="organizerLink">Organizer/RSVP Link <span class="required">*</span></label>
-          <input type="url" id="organizerLink" name="organizerLink" required placeholder="https://meetup.com/..." class="form-input" />
+          <label for="description"
+            >Short Description <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="description"
+            name="description"
+            required
+            placeholder="A brief 1-2 sentence summary for the event card..."
+            class="form-input"
+          />
         </div>
 
         <div class="form-group">
-          <label for="description">Event Description <span class="required">*</span></label>
-          <textarea id="description" name="description" rows="5" required placeholder="Tell us about the event..." class="form-input"></textarea>
-        </div>
-        
-        <div class="form-info">
-          <p>ℹ️ All submissions are reviewed manually before being posted to the site.</p>
+          <label for="body">Event Text (Optional)</label>
+          <textarea
+            id="body"
+            name="body"
+            rows="6"
+            placeholder="Full details, schedule, what to bring... (Markdown supported)"
+            class="form-input"></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary submit-btn">Submit Event for Review</button>
+        <div class="form-info">
+          <p>
+            All submissions are reviewed manually before being posted to the
+            site.
+          </p>
+        </div>
+
+        <button type="submit" class="btn btn-primary submit-btn"
+          >Submit Event for Review</button
+        >
       </form>
     </div>
   </div>
 </Layout>
 
 <script>
-  // Fallback if the user doesn't set up Formspree
-  const form = document.getElementById('submitForm') as HTMLFormElement;
-  form.addEventListener('submit', (e) => {
-    if (form.action.includes('YOUR_FORM_ENDPOINT')) {
-      e.preventDefault();
-      
+  const form = document.getElementById("submitForm") as HTMLFormElement;
+  const submitBtn = document.querySelector(".submit-btn") as HTMLButtonElement;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    submitBtn.textContent = "Submitting...";
+    submitBtn.disabled = true;
+
+    try {
       const formData = new FormData(form);
-      const subject = encodeURIComponent(`New Event Submission: ${formData.get('title')}`);
-      let body = `Please review the following event submission:\n\n`;
-      body += `Title: ${formData.get('title')}\n`;
-      body += `Date: ${formData.get('date')}\n`;
-      body += `Time: ${formData.get('time')}\n`;
-      body += `Link: ${formData.get('organizerLink')}\n\n`;
-      body += `Description:\n${formData.get('description')}\n`;
-      
-      window.location.href = `mailto:your-email@example.com?subject=${subject}&body=${encodeURIComponent(body)}`;
-      
-      alert('Since a form backend is not configured, this will try to open your email client. Alternatively, you can sign up for Formspree.io to collect submissions automatically.');
+
+      // POST to the Google Apps Script Web App
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbznflNUtglKfLYljc_BZ3IiPZ3rCeDEocBzjeCeuGc-weqWrnK90Aua7dVEKfOJ4E9boA/exec",
+        {
+          method: "POST",
+          body: formData,
+          mode: "no-cors",
+        },
+      );
+
+      const baseUrl = import.meta.env.BASE_URL;
+      window.location.href = `${baseUrl}/success`;
+    } catch (err) {
+      console.error(err);
+      alert("Network error. Please try again.");
+      submitBtn.textContent = "Submit Event for Review";
+      submitBtn.disabled = false;
     }
   });
 </script>
@@ -82,7 +178,7 @@ import Layout from '../layouts/Layout.astro';
   .intro {
     margin-bottom: 3rem;
   }
-  
+
   .intro h1 {
     font-size: 3rem;
     margin-bottom: 1rem;
@@ -90,6 +186,14 @@ import Layout from '../layouts/Layout.astro';
 
   .form-wrapper {
     padding: 2.5rem;
+  }
+
+  /* Disable the hover "pop-out" for the large form container */
+  .form-wrapper.glass-panel:hover {
+    transform: none;
+    box-shadow: var(--glass-shadow);
+    background: var(--bg-surface);
+    border: var(--glass-border);
   }
 
   .event-form {

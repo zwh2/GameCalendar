@@ -18,10 +18,7 @@ const formattedDate = date.toLocaleDateString("en-US", {
 const base = import.meta.env.BASE_URL;
 ---
 
-<a
-  href={`${base}/events/${event.slug}`}
-  class="glass-panel event-card card-link"
->
+<a href={`${base}/events/${event.id}`} class="glass-panel event-card card-link">
   <div class="event-date">
     <span class="month"
       >{

@@ -1,0 +1,72 @@
+---
+import Layout from "../layouts/Layout.astro";
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="Event Submitted">
+    <div class="success-container">
+        <div class="glass-panel text-center success-panel">
+            <div class="success-icon">✨</div>
+            <h1 class="text-gradient">Event Submitted!</h1>
+            <p class="subtitle">
+                Thank you for letting us know about the event. The details have
+                been sent to the moderator queue and will be reviewed shortly.
+            </p>
+
+            <div class="actions">
+                <a href={`${base}/`} class="btn btn-primary">Back to Events</a>
+                <a
+                    href={`${base}/submit`}
+                    class="btn glass-panel"
+                    style="padding: 0.75rem 1.5rem; border-radius: 8px;"
+                    >Submit Another</a
+                >
+            </div>
+        </div>
+    </div>
+</Layout>
+
+<style>
+    .success-container {
+        max-width: 600px;
+        margin: 4rem auto;
+        padding: 0 1rem;
+    }
+
+    .success-panel {
+        padding: 4rem 2rem;
+    }
+
+    .success-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 2.5rem;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    @media (max-width: 600px) {
+        .actions {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .btn.glass-panel {
+            width: 100%;
+        }
+    }
+</style>
