@@ -56,17 +56,25 @@ const base = import.meta.env.BASE_URL;
             <p>{location}</p>
           </div>
         </div>
-        <div class="meta-item">
-          <span class="meta-icon">🔗</span>
-          <div>
-            <strong>Info / RSVP</strong>
-            <p>
-              <a href={organizerLink} target="_blank" rel="noopener noreferrer"
-                >Organizer Link</a
-              >
-            </p>
-          </div>
-        </div>
+        {
+          organizerLink && (
+            <div class="meta-item">
+              <span class="meta-icon">🔗</span>
+              <div>
+                <strong>Info / RSVP</strong>
+                <p>
+                  <a
+                    href={organizerLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Organizer Link
+                  </a>
+                </p>
+              </div>
+            </div>
+          )
+        }
       </div>
     </div>
 
