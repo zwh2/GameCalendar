@@ -21,6 +21,8 @@ const formattedDate = date.toLocaleDateString("en-US", {
   day: "numeric",
 });
 
+const displayTime = time;
+
 const base = import.meta.env.BASE_URL;
 ---
 
@@ -44,7 +46,7 @@ const base = import.meta.env.BASE_URL;
           <span class="meta-icon">🕒</span>
           <div>
             <strong>Time</strong>
-            <p>{time}</p>
+            <p>{displayTime}</p>
           </div>
         </div>
         <div class="meta-item">
