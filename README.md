@@ -40,6 +40,3 @@ The deployment process is automated via the workflow defined in `.github/workflo
 
 -   **Push to Main:** Pushing changes to the `main` branch automatically triggers a build and deploys the update to GitHub Pages.
 -   **Nightly Updates:** A cron job runs every night at midnight UTC to rebuild the site. This fetches the latest event data from the Google Sheet, ensuring the calendar remains up-to-date without manual intervention.
-
-### Deprecated Scripts
-The `scripts/generate-events.mjs` script (and the corresponding `npm run generate-events` command) is deprecated. The site now uses a custom content loader in `src/content/config.ts` to fetch data directly from Google Sheets, replacing the need for local file generation.
