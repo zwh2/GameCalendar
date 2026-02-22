@@ -39,4 +39,4 @@ This generates the static site in the `dist/` directory.
 The deployment process is automated via the workflow defined in `.github/workflows/deploy.yml`.
 
 -   **Push to Main:** Pushing changes to the `main` branch automatically triggers a build and deploys the update to GitHub Pages.
--   **Nightly Updates:** A cron job runs every night at midnight UTC to rebuild the site. This fetches the latest event data from the Google Sheet, ensuring the calendar remains up-to-date without manual intervention.
+-   **Nightly Updates:** A cron job runs every night at 8AM UTC to rebuild the site. This fetches the latest event data from the Google Sheet, ensuring the calendar remains up-to-date without manual intervention.
