@@ -136,6 +136,8 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
+  import { GOOGLE_SCRIPT_URL } from "../consts";
+
   const form = document.getElementById("submitForm") as HTMLFormElement;
   const submitBtn = document.querySelector(".submit-btn") as HTMLButtonElement;
 
@@ -148,14 +150,11 @@ import Layout from "../layouts/Layout.astro";
       const formData = new FormData(form);
 
       // POST to the Google Apps Script Web App
-      await fetch(
-        "https://script.google.com/macros/s/AKfycbznflNUtglKfLYljc_BZ3IiPZ3rCeDEocBzjeCeuGc-weqWrnK90Aua7dVEKfOJ4E9boA/exec",
-        {
-          method: "POST",
-          body: formData,
-          mode: "no-cors",
-        },
-      );
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        body: formData,
+        mode: "no-cors",
+      });
 
       const baseUrl = import.meta.env.BASE_URL;
       window.location.href = `${baseUrl}/success`;
