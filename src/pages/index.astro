@@ -3,14 +3,11 @@ import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import EventCard from "../components/EventCard.astro";
 import Hero from "../components/Hero.astro";
+import { getUpcomingEvents } from "../utils/eventUtils";
 
 // Fetch and sort events by date (newest/upcoming first)
 const allEvents = await getCollection("events");
-const upcomingEvents = allEvents
-  .filter((event) => new Date(event.data.date) >= new Date()) // In a real app, you might want to show past events too, or filter them out.
-  .sort(
-    (a, b) => new Date(a.data.date).valueOf() - new Date(b.data.date).valueOf(),
-  );
+const upcomingEvents = getUpcomingEvents(allEvents);
 
 const base = import.meta.env.BASE_URL;
 ---
