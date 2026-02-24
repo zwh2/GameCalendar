@@ -13,14 +13,7 @@ import Layout from "../layouts/Layout.astro";
     </div>
 
     <div class="glass-panel form-wrapper">
-      <!-- We use Formspree since this is a static site. -->
-      <form action="" method="POST" id="submitForm" class="event-form">
-        <!-- Formspree Redirect Configuration -->
-        <input
-          type="hidden"
-          name="_next"
-          value="https://zhudson.github.io/GameCalendar/success"
-        />
+      <form id="submitForm" class="event-form">
         <div class="form-group">
           <label for="title">Event Title <span class="required">*</span></label>
           <input
