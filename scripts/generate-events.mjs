@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Configuration
 const CONFIG_FILE = 'src/content/recurring-events.json';
@@ -16,14 +17,15 @@ const fileExists = (filePath) => {
 };
 
 // Generate markdown content
-const generateMarkdown = (event, dateStr) => {
+export const generateMarkdown = (event, dateStr) => {
+    const escape = (str) => String(str || "").replace(/"/g, '\\"');
     return `---
-title: "${event.title}"
-description: "${event.description}"
+title: "${escape(event.title)}"
+description: "${escape(event.description)}"
 date: ${dateStr}
-time: "${event.time}"
-location: "${event.location}"
-organizerLink: "${event.organizerLink}"
+time: "${escape(event.time)}"
+location: "${escape(event.location)}"
+organizerLink: "${escape(event.organizerLink)}"
 ---
 
 ${event.body || "Join us for our regular event! Bring your favorite games or play some of ours."}
@@ -130,4 +132,6 @@ const generateEvents = () => {
 };
 
 // Run the generator
-generateEvents();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+    generateEvents();
+}
