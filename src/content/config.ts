@@ -52,7 +52,6 @@ const googleSheetsLoader = () => ({
                         body: item.body || ''
                     }
                 });
-                console.log("Successfully stored item:", item.id);
             }
         } catch (e) {
             console.error('Failed to load events from Google Sheets:', e);
