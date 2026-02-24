@@ -1,4 +1,5 @@
 import { defineCollection, z } from 'astro:content';
+import { GOOGLE_SCRIPT_URL } from '../consts';
 
 function extractTime(str) {
     if (!str) return '';
@@ -19,7 +20,10 @@ const googleSheetsLoader = () => ({
         store.clear();
         try {
             console.log("Fetching from Google Sheets...");
-            const response = await fetch('https://script.google.com/macros/s/AKfycbznflNUtglKfLYljc_BZ3IiPZ3rCeDEocBzjeCeuGc-weqWrnK90Aua7dVEKfOJ4E9boA/exec');
+            if (!GOOGLE_SCRIPT_URL) {
+                throw new Error("GOOGLE_SCRIPT_URL is not defined");
+            }
+            const response = await fetch(GOOGLE_SCRIPT_URL);
             const data = await response.json();
             console.log("Received data length:", data.length);
 

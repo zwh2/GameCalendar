@@ -136,6 +136,8 @@ import Layout from "../layouts/Layout.astro";
 </Layout>
 
 <script>
+  import { GOOGLE_SCRIPT_URL } from "../consts";
+
   const form = document.getElementById("submitForm") as HTMLFormElement;
   const submitBtn = document.querySelector(".submit-btn") as HTMLButtonElement;
 
@@ -147,9 +149,13 @@ import Layout from "../layouts/Layout.astro";
     try {
       const formData = new FormData(form);
 
+      if (!GOOGLE_SCRIPT_URL) {
+        throw new Error("GOOGLE_SCRIPT_URL is not defined");
+      }
+
       // POST to the Google Apps Script Web App
       await fetch(
-        "https://script.google.com/macros/s/AKfycbznflNUtglKfLYljc_BZ3IiPZ3rCeDEocBzjeCeuGc-weqWrnK90Aua7dVEKfOJ4E9boA/exec",
+        GOOGLE_SCRIPT_URL,
         {
           method: "POST",
           body: formData,
