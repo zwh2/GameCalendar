@@ -7,7 +7,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "generate-events": "node scripts/generate-events.mjs"
+    "generate-events": "node scripts/generate-events.mjs",
+    "test": "node --test --experimental-strip-types src/**/*.test.ts"
   },
   "dependencies": {
     "astro": "^5.17.1"

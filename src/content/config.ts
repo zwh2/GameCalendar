@@ -1,8 +1,9 @@
 import { defineCollection, z } from 'astro:content';
+import { GOOGLE_SCRIPT_URL } from '../consts';
 
 const TIME_REGEX = /(\d{1,2}):(\d{2}):\d{2}/;
-
 function extractTime(str) {
+
     if (!str) return '';
     const match = String(str).match(TIME_REGEX);
     if (match) {
@@ -20,9 +21,18 @@ const googleSheetsLoader = () => ({
     load: async ({ store }: any) => {
         store.clear();
         try {
-            console.log("Fetching from Google Sheets...");
-            const response = await fetch('https://script.google.com/macros/s/AKfycbznflNUtglKfLYljc_BZ3IiPZ3rCeDEocBzjeCeuGc-weqWrnK90Aua7dVEKfOJ4E9boA/exec');
+            console.log("Fetching from Google Sheets...", GOOGLE_SCRIPT_URL);
+            const response = await fetch(GOOGLE_SCRIPT_URL);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch events: ${response.status} ${response.statusText}`);
+            }
+
             const data = await response.json();
+
+            if (data.status === "error") {
+                throw new Error(`Google Script returned error: ${data.message}`);
+            }
+
             console.log("Received data length:", data.length);
 
             for (const item of data) {
@@ -44,10 +54,10 @@ const googleSheetsLoader = () => ({
                         body: item.body || ''
                     }
                 });
-                console.log("Successfully stored item:", item.id);
             }
         } catch (e) {
             console.error('Failed to load events from Google Sheets:', e);
+            throw e; // Fail the build if data cannot be loaded
         }
     }
 });
@@ -60,7 +70,10 @@ const eventsCollection = defineCollection({
         date: z.date(),
         time: z.string(),
         location: z.string(),
-        organizerLink: z.string().url().or(z.string()),
+        // Ensure strictly safe URLs (http/https) or empty string
+        organizerLink: z.string().url().refine((url) => url.startsWith('http'), {
+            message: "Must start with http:// or https://"
+        }).or(z.literal('')),
         body: z.string().optional()
     }),
 });
