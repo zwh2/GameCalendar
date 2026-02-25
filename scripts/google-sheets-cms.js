@@ -116,3 +116,128 @@ function onEdit(e) {
         sheet.deleteRow(row);
     }
 }
+
+// ==========================================
+// RECURRING EVENTS GENERATOR
+// ==========================================
+
+function onOpen() {
+    const ui = SpreadsheetApp.getUi();
+    ui.createMenu('GameCalendar')
+        .addItem('Generate Recurring Events', 'showRecurringSidebar')
+        .addToUi();
+}
+
+function showRecurringSidebar() {
+    const html = HtmlService.createHtmlOutputFromFile('Sidebar')
+        .setTitle('Recurring Events')
+        .setWidth(350);
+    SpreadsheetApp.getUi().showSidebar(html);
+}
+
+// Generates dates based on settings and appends them to the sheet
+function generateEvents(eventData) {
+    // Use the Approved sheet directly if possible, else fallback to active
+    let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Approved");
+    if (!sheet) {
+        sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    }
+
+    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+
+    const dates = calculateDates(eventData);
+    if (dates.length === 0) {
+        throw new Error("No dates generated. Check your start date.");
+    }
+
+    const rows = dates.map(date => {
+        let row = new Array(headers.length).fill('');
+
+        headers.forEach((header, index) => {
+            let h = header.toString().toLowerCase().trim();
+
+            if (h === 'id') row[index] = generateId();
+            else if (h === 'title') row[index] = eventData.title;
+            else if (h === 'date') row[index] = Utilities.formatDate(date, Session.getScriptTimeZone(), "yyyy-MM-dd");
+            else if (h === 'starttime') row[index] = eventData.startTime;
+            else if (h === 'endtime') row[index] = eventData.endTime;
+            else if (h === 'time') row[index] = eventData.startTime ? `${eventData.startTime} - ${eventData.endTime}` : '';
+            else if (h === 'location') row[index] = eventData.location;
+            else if (h === 'description') row[index] = eventData.description;
+            else if (h === 'organizerlink') row[index] = eventData.organizerLink;
+            else if (h === 'body') row[index] = '';
+        });
+
+        return row;
+    });
+
+    // Append to bottom of sheet
+    sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, rows[0].length).setValues(rows);
+    return dates.length;
+}
+
+function generateId() {
+    return Math.random().toString(36).substring(2, 9);
+}
+
+function calculateDates(eventData) {
+    const dates = [];
+    let currentDate = new Date(eventData.startDate);
+    // Normalize time to noon to avoid daylight saving issues
+    currentDate.setHours(12, 0, 0, 0);
+
+    const occurrences = parseInt(eventData.occurrences, 10);
+    const freq = eventData.frequency;
+
+    for (let i = 0; i < occurrences; i++) {
+        // Add the current calculated date, ignoring the original start date for Nth Day rule
+        // if the start date doesn't match the Nth day rule itself.
+        if (i === 0 && freq === 'monthly_nth') {
+            currentDate = getNthDayOfMonth(currentDate.getFullYear(), currentDate.getMonth(), parseInt(eventData.nthWeek), parseInt(eventData.nthDay));
+        }
+
+        // Copy the date
+        dates.push(new Date(currentDate));
+
+        if (freq === 'weekly') {
+            currentDate.setDate(currentDate.getDate() + 7);
+        } else if (freq === 'monthly_date') {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+        } else if (freq === 'monthly_nth') {
+            // Move to next month and find the Nth day again
+            let nextMonth = currentDate.getMonth() + 1;
+            let year = currentDate.getFullYear();
+            if (nextMonth > 11) {
+                nextMonth = 0;
+                year++;
+            }
+            currentDate = getNthDayOfMonth(year, nextMonth, parseInt(eventData.nthWeek), parseInt(eventData.nthDay));
+        }
+    }
+    return dates;
+}
+
+// nthWeek: 1-5 (5 = last), dayOfWeek: 0-6 (0 = Sunday)
+function getNthDayOfMonth(year, month, nthWeek, dayOfWeek) {
+    let date = new Date(year, month, 1, 12, 0, 0, 0);
+    let firstDay = date.getDay();
+
+    let offset = dayOfWeek - firstDay;
+    if (offset < 0) offset += 7;
+
+    let firstOccurrence = 1 + offset; // Start day of the 1st matching day-of-week
+
+    if (nthWeek <= 4) {
+        date.setDate(firstOccurrence + (nthWeek - 1) * 7);
+    } else if (nthWeek === 5) {
+        // Determine the last occurence (could be 4th or 5th)
+        let fifthOccurrence = firstOccurrence + 28;
+        let tempDate = new Date(year, month, fifthOccurrence, 12, 0, 0, 0);
+        if (tempDate.getMonth() === month) {
+            date = tempDate;
+        } else {
+            date.setDate(firstOccurrence + 21); // Set to 4th occurrence if 5th is in next month
+        }
+    }
+    return date;
+}

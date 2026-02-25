@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <style>
+        body {
+            font-family: Roboto, Arial, sans-serif;
+            padding: 15px;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn {
+            background-color: #0f9d58;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #0b8043;
+        }
+
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #status {
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .success {
+            color: #0f9d58;
+        }
+
+        .error {
+            color: #d93025;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .row>div {
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="eventForm" onsubmit="handleFormSubmit(event)">
+        <div class="form-group">
+            <label for="title">Event Title *</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+
+        <div class="row form-group">
+            <div>
+                <label for="startDate">Start Date *</label>
+                <input type="date" id="startDate" name="startDate" required>
+            </div>
+            <div>
+                <label for="occurrences">Occurrences *</label>
+                <input type="number" id="occurrences" name="occurrences" value="5" min="1" max="100" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="frequency">Repeat Rule *</label>
+            <select id="frequency" name="frequency" required onchange="toggleNthDayRules()">
+                <option value="weekly">Weekly</option>
+                <option value="monthly_date">Monthly (Same Date)</option>
+                <option value="monthly_nth">Monthly (Nth Day, e.g. First Friday)</option>
+            </select>
+        </div>
+
+        <div id="nthDayDiv" class="row form-group hidden">
+            <div>
+                <label for="nthWeek">Occurrence</label>
+                <select id="nthWeek" name="nthWeek">
+                    <option value="1">First</option>
+                    <option value="2">Second</option>
+                    <option value="3">Third</option>
+                    <option value="4">Fourth</option>
+                    <option value="5">Last</option>
+                </select>
+            </div>
+            <div>
+                <label for="nthDay">Day of Week</label>
+                <select id="nthDay" name="nthDay">
+                    <option value="0">Sunday</option>
+                    <option value="1">Monday</option>
+                    <option value="2">Tuesday</option>
+                    <option value="3">Wednesday</option>
+                    <option value="4">Thursday</option>
+                    <option value="5">Friday</option>
+                    <option value="6">Saturday</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row form-group">
+            <div>
+                <label for="startTime">Start Time</label>
+                <input type="time" id="startTime" name="startTime">
+            </div>
+            <div>
+                <label for="endTime">End Time</label>
+                <input type="time" id="endTime" name="endTime">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location">
+        </div>
+
+        <div class="form-group">
+            <label for="organizerLink">Organizer Link (URL)</label>
+            <input type="url" id="organizerLink" name="organizerLink" placeholder="https://...">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Short Description</label>
+            <textarea id="description" name="description" rows="3"></textarea>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn">Generate Events</button>
+        <div id="status"></div>
+    </form>
+
+    <script>
+        function toggleNthDayRules() {
+            const freq = document.getElementById('frequency').value;
+            const div = document.getElementById('nthDayDiv');
+            if (freq === 'monthly_nth') {
+                div.classList.remove('hidden');
+            } else {
+                div.classList.add('hidden');
+            }
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('status');
+
+            btn.disabled = true;
+            btn.innerText = "Generating...";
+            status.innerText = "";
+            status.className = "";
+
+            // Gather data
+            const form = document.getElementById('eventForm');
+            const data = {
+                title: form.title.value,
+                startDate: form.startDate.value,
+                occurrences: form.occurrences.value,
+                frequency: form.frequency.value,
+                nthWeek: form.nthWeek.value,
+                nthDay: form.nthDay.value,
+                startTime: form.startTime.value, // e.g., "18:00"
+                endTime: form.endTime.value,
+                location: form.location.value,
+                organizerLink: form.organizerLink.value,
+                description: form.description.value
+            };
+
+            google.script.run
+                .withSuccessHandler(function (count) {
+                    status.innerText = "Successfully added " + count + " events!";
+                    status.className = "success";
+                    btn.disabled = false;
+                    btn.innerText = "Generate Events";
+                    form.reset();
+                    toggleNthDayRules(); // reset UI
+                })
+                .withFailureHandler(function (error) {
+                    status.innerText = "Error: " + error.message;
+                    status.className = "error";
+                    btn.disabled = false;
+                    btn.innerText = "Generate Events";
+                })
+                .generateEvents(data);
+        }
+    </script>
+</body>
+
+</html>
