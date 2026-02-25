@@ -1,17 +1,5 @@
 import { defineCollection, z } from 'astro:content';
-
-function extractTime(str) {
-    if (!str) return '';
-    const match = String(str).match(/(\d{1,2}):(\d{2}):\d{2}/);
-    if (match) {
-        let h = parseInt(match[1], 10);
-        const m = match[2];
-        const ampm = h >= 12 ? 'PM' : 'AM';
-        h = h % 12 || 12;
-        return `${h}:${m} ${ampm}`;
-    }
-    return str;
-}
+import { extractTime } from '../utils/time.ts';
 
 const googleSheetsLoader = () => ({
     name: 'google-sheets-events',
