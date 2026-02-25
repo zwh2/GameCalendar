@@ -165,7 +165,7 @@ function generateEvents(eventData) {
             else if (h === 'location') row[index] = eventData.location;
             else if (h === 'description') row[index] = eventData.description;
             else if (h === 'organizerlink') row[index] = eventData.organizerLink;
-            else if (h === 'body') row[index] = '';
+            else if (h === 'body') row[index] = eventData.body || '';
         });
 
         return row;

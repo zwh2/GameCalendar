@@ -160,6 +160,11 @@
             <textarea id="description" name="description" rows="3"></textarea>
         </div>
 
+        <div class="form-group">
+            <label for="body">Event Body (Markdown supported)</label>
+            <textarea id="body" name="body" rows="6"></textarea>
+        </div>
+
         <button type="submit" id="submitBtn" class="btn">Generate Events</button>
         <div id="status"></div>
     </form>
@@ -198,7 +203,8 @@
                 endTime: form.endTime.value,
                 location: form.location.value,
                 organizerLink: form.organizerLink.value,
-                description: form.description.value
+                description: form.description.value,
+                body: form.body.value
             };
 
             google.script.run
