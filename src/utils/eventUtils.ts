@@ -15,13 +15,21 @@ export interface Event {
  * @returns Filtered and sorted events
  */
 export function getUpcomingEvents(events: Event[], referenceDate: Date = new Date()): Event[] {
+  // Get the local YYYY-MM-DD string for the reference date
+  const refYear = referenceDate.getFullYear();
+  const refMonth = String(referenceDate.getMonth() + 1).padStart(2, '0');
+  const refDay = String(referenceDate.getDate()).padStart(2, '0');
+  const localTodayStr = `${refYear}-${refMonth}-${refDay}`;
+
   return events
     .filter((event) => {
       const eventDate = new Date(event.data.date);
-      // Set hours, minutes, seconds, and ms to 0 for a fair comparison of just the date if needed,
-      // but the original code used full Date comparison.
-      // To match original behavior:
-      return eventDate >= referenceDate;
+      // Because Astro config parses the string as midnight UTC,
+      // we can extract the exact YYYY-MM-DD back using toISOString()
+      const eventDateStr = eventDate.toISOString().split('T')[0];
+
+      // Compare lexicographically (e.g. "2026-03-04" >= "2026-03-04")
+      return eventDateStr >= localTodayStr;
     })
     .sort((a, b) => {
       const dateA = new Date(a.data.date).valueOf();

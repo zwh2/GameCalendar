@@ -182,9 +182,9 @@ function generateId() {
 
 function calculateDates(eventData) {
     const dates = [];
-    let currentDate = new Date(eventData.startDate);
-    // Normalize time to noon to avoid daylight saving issues
-    currentDate.setHours(12, 0, 0, 0);
+    // Parse the date string "YYYY-MM-DD" directly to avoid timezone shift from UTC parsing
+    const [year, month, day] = eventData.startDate.split('-');
+    let currentDate = new Date(year, month - 1, day, 12, 0, 0, 0);
 
     const occurrences = parseInt(eventData.occurrences, 10);
     const freq = eventData.frequency;
