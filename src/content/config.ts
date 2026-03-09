@@ -1,20 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { GOOGLE_SCRIPT_URL } from '../consts';
-
-const TIME_REGEX = /(\d{1,2}):(\d{2}):\d{2}/;
-function extractTime(str) {
-
-    if (!str) return '';
-    const match = String(str).match(TIME_REGEX);
-    if (match) {
-        let h = parseInt(match[1], 10);
-        const m = match[2];
-        const ampm = h >= 12 ? 'PM' : 'AM';
-        h = h % 12 || 12;
-        return `${h}:${m} ${ampm}`;
-    }
-    return str;
-}
+import { extractTime } from '../utils/timeUtils';
 
 const googleSheetsLoader = () => ({
     name: 'google-sheets-events',
