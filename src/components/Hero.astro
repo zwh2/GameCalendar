@@ -1,6 +1,6 @@
 ---
 interface Props {
-    activePage?: "events" | "calendar";
+    activePage?: "events" | "calendar" | "submit";
 }
 
 const { activePage } = Astro.props;
@@ -18,16 +18,23 @@ const base = import.meta.env.BASE_URL;
         <a
             href={`${base}/`}
             class={`btn ${activePage === "events" ? "btn-primary" : "glass-panel"}`}
-            style={activePage === "calendar"
+            style={activePage !== "events"
                 ? "padding: 0.75rem 1.5rem; border-radius: 8px;"
                 : ""}>Browse Events</a
         >
         <a
             href={`${base}/calendar`}
             class={`btn ${activePage === "calendar" ? "btn-primary" : "glass-panel"}`}
-            style={activePage === "events"
+            style={activePage !== "calendar"
                 ? "padding: 0.75rem 1.5rem; border-radius: 8px;"
                 : ""}>View Calendar</a
+        >
+        <a
+            href={`${base}/submit`}
+            class={`btn ${activePage === "submit" ? "btn-primary" : "glass-panel"}`}
+            style={activePage !== "submit"
+                ? "padding: 0.75rem 1.5rem; border-radius: 8px;"
+                : ""}>Submit an Event</a
         >
     </div>
 </div>
