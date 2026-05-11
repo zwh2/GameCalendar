@@ -5,7 +5,7 @@ This repository contains the source code for the **Game Calendar** website.
 ## Live Site
 
 You can visit the live site here:
-**[https://zhudson.github.io/GameCalendar](https://zhudson.github.io/GameCalendar)**
+**[https://gamecalendar.org](https://gamecalendar.org)**
 
 ## Development
 
