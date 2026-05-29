@@ -21,7 +21,7 @@ const googleSheetsLoader = () => ({
     load: async ({ store }: any) => {
         store.clear();
         try {
-            console.log("Fetching from Google Sheets...", GOOGLE_SCRIPT_URL);
+            console.log("Fetching from Google Sheets...");
             const response = await fetch(GOOGLE_SCRIPT_URL);
             if (!response.ok) {
                 throw new Error(`Failed to fetch events: ${response.status} ${response.statusText}`);
